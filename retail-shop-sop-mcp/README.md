@@ -2,7 +2,7 @@
 
 MCP server ที่เปิด SOP-RETAIL-01 (ฝ่ายจัดซื้อ + ฝ่ายขายหน้าร้าน) ให้เรียกใช้เป็นเครื่องมือ (tools) ได้ ผ่าน [Model Context Protocol](https://modelcontextprotocol.io)
 
-**สำคัญ:** นี่คือ MCP server แบบรันในเครื่อง (local stdio server) — ไม่ใช่บริการออนไลน์ ต้องติดตั้งและรันบนคอมพิวเตอร์ที่จะใช้งาน แล้วชี้ MCP client (เช่น Claude Desktop, Claude Code) ให้มาเรียกใช้ ไฟล์นี้ไม่ได้เชื่อมกับแชทนี้โดยอัตโนมัติ
+โดยปกติจะรันแบบในเครื่อง (local stdio server) — ต้องติดตั้งและรันบนคอมพิวเตอร์ที่จะใช้งาน แล้วชี้ MCP client (เช่น Claude Desktop, Claude Code) ให้มาเรียกใช้ ไฟล์นี้ไม่ได้เชื่อมกับแชทนี้โดยอัตโนมัติ แต่ก็รันเป็น HTTP server ออนไลน์ได้เช่นกัน (ดู [Deploy บน Railway](#deploy-บน-railway))
 
 ## เครื่องมือ (tools) ที่มีให้
 
@@ -56,6 +56,12 @@ python3 server.py
 ```bash
 claude mcp add retail-shop-sop -- python3 /absolute/path/to/retail-shop-sop-mcp/server.py
 ```
+
+## Deploy บน Railway
+
+ถ้าตั้งค่า Root Directory ของ service เป็น root ของ repo (ไม่ใช่โฟลเดอร์นี้), Railway จะ build ผ่าน `requirements.txt` และ `Procfile` ที่ root ของ repo ให้อัตโนมัติ ไม่ต้องตั้งค่าเพิ่ม
+
+เมื่อ deploy แล้ว Railway จะกำหนด env `PORT` มาให้ — `server.py` ตรวจพบค่านี้แล้วสลับไปรันเป็น **streamable-http server** ที่ `0.0.0.0:$PORT` แทน stdio โดยอัตโนมัติ (endpoint อยู่ที่ `/mcp`) ไม่ต้องแก้โค้ดเพิ่ม
 
 ## หมายเหตุ
 

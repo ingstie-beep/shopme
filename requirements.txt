@@ -1,0 +1,1 @@
+-r retail-shop-sop-mcp/requirements.txt

@@ -6,8 +6,11 @@ MCP server: ร้านค้าปลีก - SOP ฝ่ายจัดซื�
 (tools) ได้ เช่น ดูรายชื่อหัวข้อทั้งหมด, ดึงเนื้อหาหัวข้อใดหัวข้อหนึ่ง, ค้นหาคำในเอกสาร,
 หรือดึงเอกสารฉบับเต็ม
 
-รันแบบ stdio server: python3 server.py
+รันแบบ stdio server (ใช้กับ Claude Desktop/Claude Code): python3 server.py
+รันแบบ HTTP server (เช่นบน Railway): ตั้ง env PORT แล้วรัน python3 server.py — จะรันเป็น
+streamable-http server ที่ 0.0.0.0:$PORT โดยอัตโนมัติ
 """
+import os
 import re
 from pathlib import Path
 
@@ -16,7 +19,9 @@ from mcp.server.fastmcp import FastMCP
 SOP_PATH = Path(__file__).parent / "sop_data" / "full-sop.md"
 SOP_TEXT = SOP_PATH.read_text(encoding="utf-8")
 
-mcp = FastMCP("retail-shop-sop")
+PORT = os.environ.get("PORT")
+
+mcp = FastMCP("retail-shop-sop", host="0.0.0.0", port=int(PORT)) if PORT else FastMCP("retail-shop-sop")
 
 
 def _parse_sections(text: str) -> dict[str, str]:
@@ -83,4 +88,4 @@ def full_sop_resource() -> str:
 
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="streamable-http" if PORT else "stdio")
